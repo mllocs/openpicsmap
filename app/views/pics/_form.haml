@@ -1,0 +1,61 @@
+= form_for(@pic, :html => { :multipart => true }) do |f|
+
+  - if @pic.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@pic.errors.count, "error")
+        prohibited this pic from being saved:
+      %ul
+        - @pic.errors.full_messages.each do |msg|
+          %li= msg
+
+  %br
+  .field
+    - if @pic.new_record?
+      = f.label :image
+      %br
+      = f.file_field :image
+    - else
+      = image_tag @pic.image(:medium)
+
+  .field
+    = f.label :title
+    %br
+    = f.text_field :title
+
+  .field
+    = f.label :description
+    %br
+    = f.text_area :description, :rows => 4
+
+  - if not @pic.new_record?
+    .field
+      = f.label :taken_at
+      %br
+      = f.date_select :taken_at
+      
+  / .field
+  /   = f.label :address
+  /   %br/
+  /   = f.text_field :address
+  
+  %br
+  %div#form_map{data: { point: @pic.to_json }}
+
+  %br
+  .field
+    = f.label :latitude
+    %br
+    = f.text_field :latitude, :size => 12, :readonly => :readonly
+  .field
+    = f.label :longitude
+    %br
+    = f.text_field :longitude, :size => 12, :readonly => :readonly
+
+  .actions
+    = f.submit
+
+:javascript
+  $(document).ready(function() {
+    Map.init_form("form_map");
+  });

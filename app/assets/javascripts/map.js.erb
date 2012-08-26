@@ -1,0 +1,219 @@
+var Map = {
+
+  map: null,
+  div_id: null,
+  selectedMarker: null,
+  selectControl: null,
+  markers: null,
+  new_pic_popup: null,
+  default_opacity: 0.4,
+
+  init_form: function(div_id) {
+
+    // default initialization
+    this.init(div_id);
+
+    // get the point
+    var point = $("#" + this.div_id).data("point");
+    var marker = this.add_marker(point);
+    var zoom = 6;
+
+    // set center
+    if(!this.valid_point(point)) {
+      zoom = 1;
+    }
+
+    this.map.setCenter(marker.lonlat, zoom);
+    this.selectedMarker = marker;
+
+    this.map.events.register("click", this, function(e) {
+
+      var lonLat = this.map.getLonLatFromViewPortPx(e.xy);
+      px = this.map.getLayerPxFromViewPortPx(e.xy);
+      this.selectedMarker.moveTo(px);
+
+      lonLat.transform(
+        this.map.getProjectionObject(), // to Spherical Mercator Projection
+        new OpenLayers.Projection("EPSG:4326") // transform from WGS 1984
+      );
+      $("#pic_latitude").val(lonLat.lat);
+      $("#pic_longitude").val(lonLat.lon);
+
+    });
+
+  },
+
+  init_full: function(div_id) {
+
+    // default initialization
+    this.init(div_id);
+
+    // resize map to get full height
+    $("#" + this.div_id).height($(window).innerHeight() - 52);
+
+    // get data from the map div
+    var points = $("#" + this.div_id).data("points");
+    var selected_id = $("#" + this.div_id).data("selected_id");
+
+    // draw the points
+    for(var i = 0; i < points.length; i++) {
+
+      // Add point marker to the layer
+      var marker = this.add_marker(points[i]);
+
+      if(points[i].id === selected_id) {
+        this.selectedMarker = marker;
+        this.selectedMarker.setOpacity(1);
+      }
+
+      var self = this;
+      marker.events.register("click", marker, function(e) {
+
+        if(self.selectedMarker !== this) {
+
+          // popup content
+          var content = "<a href='" + this.pic_image_url + "'><img src='" + this.pic_image_thumb_url + "' alt='image'></img></a>";
+          content += "<br /><strong>" + this.pic_title + "</strong>";
+
+          if(window.logged_in) {
+            content += " · <a href='" + this.edit_pic_path + "'>Edit</a>";
+          }
+
+          popup = new OpenLayers.Popup.FramedCloud(
+            "pic_" + this.pic_id,
+            this.lonlat,
+            null, //new OpenLayers.Size(100, 100),
+            content,
+            null, 
+            false);
+
+          this.popup = popup;
+
+          if(self.selectedMarker) {
+            if(self.selectedMarker.popup) {
+              self.map.removePopup(self.selectedMarker.popup);
+            }
+            self.selectedMarker.setOpacity(self.default_opacity);
+          }
+          self.selectedMarker = this;
+          this.setOpacity(1);
+          self.map.addPopup(popup);
+        }
+
+        if(self.new_pic_popup !== null) {
+          self.map.removePopup(self.new_pic_popup);
+        }
+
+      });
+
+      marker.events.register("mouseover", marker, function(e) {
+        this.setOpacity(1);
+      });
+
+      marker.events.register("mouseout", marker, function(e) {
+        if(self.selectedMarker !== this) {
+          this.setOpacity(self.default_opacity);
+        }
+      });
+    }
+
+
+    this.map.events.register("click", this, function(e) {
+
+      // If some active marker
+      if(this.selectedMarker !== null) {
+        if(this.selectedMarker.popup) {
+          this.map.removePopup(this.selectedMarker.popup);
+        }
+        this.selectedMarker.setOpacity(this.default_opacity);
+        this.selectedMarker = null;
+      } else {
+
+        if(window.logged_in) {
+          // Remove new pic popup if any
+          if(this.new_pic_popup) {
+            this.map.removePopup(this.new_pic_popup);
+          }
+
+          // convert lonlat
+          var lonLat = this.map.getLonLatFromViewPortPx(e.xy);
+
+          var customLonLat = this.map.getLonLatFromViewPortPx(e.xy);
+
+          customLonLat.transform(
+            this.map.getProjectionObject(), // to Spherical Mercator Projection
+            new OpenLayers.Projection("EPSG:4326") // transform from WGS 1984
+          );
+
+          // Create new_pic popup
+          this.new_pic_popup = new OpenLayers.Popup.FramedCloud(
+            "new_pic_popup",
+            lonLat,
+            null, //new OpenLayers.Size(100, 100),
+            "<a href='/pics/new?lon=" + customLonLat.lon + "&lat=" + customLonLat.lat + "'>New Pic</a>",
+            null, 
+            true);
+          this.map.addPopup(this.new_pic_popup);
+        }
+      }
+    });
+
+    // set map center
+    if(this.selectedMarker) {
+      this.map.setCenter(this.selectedMarker.lonlat, 10);
+    } else {
+      this.map.setCenter(new OpenLayers.LonLat(0, 30).transform(
+        new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+        this.map.getProjectionObject() // to Spherical Mercator Projection
+      ), 3);
+    }
+
+  },
+
+  init: function(div_id) {
+
+    // set div_id
+    this.div_id = div_id;
+
+    // create the map 
+    this.map = new OpenLayers.Map(this.div_id);
+
+    // create and add the layers and controls
+    this.markers = new OpenLayers.Layer.Markers("Markers");
+    this.map.addLayers([new OpenLayers.Layer.OSM(), this.markers]);
+
+  },
+
+  create_lonLat: function(lon, lat) {
+    var lonLat = new OpenLayers.LonLat(lon, lat);
+    lonLat.transform(
+      new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+      this.map.getProjectionObject() // to Spherical Mercator Projection
+    );
+    return lonLat;
+  },
+
+  add_marker: function(point) {
+
+    // set default markers attributes
+    if(this.valid_point(point)) {
+      var lonLat = this.create_lonLat(point.longitude, point.latitude);
+    } else {
+      var lonLat = this.create_lonLat(0, 0);
+    }
+    var marker = new OpenLayers.Marker(lonLat);
+    marker.pic_image_thumb_url = point.image_thumb_url;
+    marker.pic_image_url = point.image_url;
+    marker.edit_pic_path = point.edit_pic_path;
+    marker.pic_id = point.id
+    marker.pic_title = point.title
+    marker.map = this.map;
+    marker.setOpacity(this.default_opacity);
+    this.markers.addMarker(marker);
+    return marker;
+  },
+
+  valid_point: function(point) {
+    return isNumber(point.latitude) && isNumber(point.longitude);
+  }
+};

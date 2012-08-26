@@ -1,0 +1,11 @@
+.left
+  %h1= link_to "OpenPicsMap", root_path
+
+.right
+  = link_to "Gallery", pics_path
+  = link_to "Map", map_pics_path
+  = link_to "New pic", new_pic_path if current_user
+  - if current_user
+    = link_to "Logout", logout_path
+  - else
+    = link_to "Login", login_path

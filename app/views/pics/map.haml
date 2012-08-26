@@ -1,0 +1,6 @@
+%div#map{data: { points: @pics.to_json, selected_id: @selected_pic_id }}
+
+:javascript
+  $(document).ready(function() {
+    Map.init_full("map");
+  });
