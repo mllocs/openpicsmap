@@ -1,43 +1,3 @@
-body {
-  @include background-image(radial-gradient(50% 50%, circle cover, #fff, #ccc));
-  color: #333;
-  font-family: helvetica, sans-serif;
-  font-size: 13px;
-  line-height: 18px;
-  padding: 0;
-  margin: 0;
-}
-
-p, ol, ul, td {
-  font-family: verdana, arial, helvetica, sans-serif;
-  font-size: 13px;
-  line-height: 18px;
-}
-
-pre {
-  background-color: #eee;
-  padding: 10px;
-  font-size: 11px;
-}
-
-input[type=submit] {
-  margin-top: 20px;
-  @include button(shiny);
-}
-
-a {
-  color: #222;
-  &:hover {
-    color: #444;
-  }
-}
-
-div {
-  &.field, &.actions {
-    margin-bottom: 10px;
-  }
-}
-
 #nav {
   background-color: black;
   @include clearfix;
@@ -110,4 +70,16 @@ div {
   margin: 30px;
   padding: 30px 50px;
   background-color: #EEE;
+}
+
+#footer {
+  text-align: center;
+  font-size: 10px;
+  opacity: 0.8;
+  z-index: 1000;
+  padding: 3px;
+  background-color: #EEE;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
