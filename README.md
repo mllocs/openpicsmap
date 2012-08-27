@@ -3,6 +3,14 @@ Open Pics Map
 
 A Rails application to manage your photos and pin them in a map.
 
+Features:
+
+* Upload jpeg pictures with [paperclip gem](https://github.com/thoughtbot/paperclip).
+* Create 3 image styles (100x100, 300x200, 1024x1024).
+* Extract EXIF metadata with [exifr gem](https://github.com/remvee/exifr/).
+* Compress the images with [jpegoptim](http://www.kokkonen.net/tjko/projects.html).
+* Geolocate and visualize your pics in [Open Street Map](http://openstreetmap.org).
+
 ---
 
 Open Pics Map

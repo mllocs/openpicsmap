@@ -5,7 +5,7 @@ class Pic < ActiveRecord::Base
   #geocoded_by :address
 
   has_attached_file :image, 
-                    :styles => { :medium => "300x300>", :thumb => "100x100>" }, 
+                    :styles => { :thumb => "100x100>", :medium => "300x300>", :original => "1024x1024" }, 
                     :processors => [:thumbnail, :metadata] # /lib/paperclip_processors/metadata.rb
 
   validates :image, 
@@ -15,6 +15,7 @@ class Pic < ActiveRecord::Base
   validates :title, :presence => true
 
   #after_validation :geocode#, :if => :address_changed?
+  after_save :optimize_jpeg, :if => :image_file_name_changed?
   before_destroy :destroy_image
 
   def as_json(options = { })
@@ -47,4 +48,10 @@ class Pic < ActiveRecord::Base
   def destroy_image
     self.image.destroy
   end
+
+  def optimize_jpeg
+    image_dir = File.dirname File.dirname(self.image.path)
+    %x[jpegoptim `find #{image_dir} -name *.JPG`]
+  end
+
 end

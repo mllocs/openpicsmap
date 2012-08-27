@@ -162,7 +162,7 @@ var Map = {
     if(this.selectedMarker) {
       this.map.setCenter(this.selectedMarker.lonlat, 10);
     } else {
-      this.map.setCenter(new OpenLayers.LonLat(0, 30).transform(
+      this.map.setCenter(new OpenLayers.LonLat(0, 40).transform(
         new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
         this.map.getProjectionObject() // to Spherical Mercator Projection
       ), 3);
