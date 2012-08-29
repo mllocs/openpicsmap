@@ -51,6 +51,12 @@ var Map = {
     // resize map to get full height
     $("#" + this.div_id).height($(window).innerHeight() - 52);
 
+    var self = this;
+    window.onresize = function() {
+      $("#" + self.div_id).height($(window).innerHeight() - 52);
+      self.map.updateSize();
+    };
+
     // get data from the map div
     var points = $("#" + this.div_id).data("points");
     var selected_id = $("#" + this.div_id).data("selected_id");
@@ -66,7 +72,6 @@ var Map = {
         this.selectedMarker.setOpacity(1);
       }
 
-      var self = this;
       marker.events.register("click", marker, function(e) {
 
         if(self.selectedMarker !== this) {
@@ -162,11 +167,13 @@ var Map = {
     if(this.selectedMarker) {
       this.map.setCenter(this.selectedMarker.lonlat, 10);
     } else {
-      this.map.setCenter(new OpenLayers.LonLat(0, 40).transform(
+      this.map.setCenter(new OpenLayers.LonLat(0, 20).transform(
         new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
         this.map.getProjectionObject() // to Spherical Mercator Projection
       ), 3);
     }
+
+    this.map.updateSize();
 
   },
 
