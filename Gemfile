@@ -31,11 +31,10 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 # Use unicorn as the app server
 # gem 'unicorn'
 
-# Deploy with Capistrano
-# gem 'capistrano'
-
-# To use debugger
-gem 'debugger'
+group :development do
+  gem 'capistrano' # Deploy with Capistrano
+  gem 'debugger' # To use debugger
+end
 
 gem 'bourbon'
 gem 'haml'
