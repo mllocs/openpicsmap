@@ -15,5 +15,7 @@ capybara-*.html
 rerun.txt
 pickle-email-*.html
 pickle-email-*.html
+
+# Assuming unchanged
 Capfile
-config/deploy.rb
+/config/deploy.rb
