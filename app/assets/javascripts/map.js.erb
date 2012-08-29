@@ -201,7 +201,14 @@ var Map = {
     } else {
       var lonLat = this.create_lonLat(0, 0);
     }
-    var marker = new OpenLayers.Marker(lonLat);
+
+    // set the image icon
+    var size = new OpenLayers.Size(25, 25);
+    var offset = new OpenLayers.Pixel(-(size.w/2), - size.h);
+    var icon = new OpenLayers.Icon("<%= asset_path('marker.png') %>", size,
+
+    // create the marker                                  
+    var marker = new OpenLayers.Marker(lonLat, icon);
     marker.pic_image_thumb_url = point.image_thumb_url;
     marker.pic_image_url = point.image_url;
     marker.edit_pic_path = point.edit_pic_path;
