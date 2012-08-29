@@ -1,7 +1,0 @@
-#!/bin/bash
-
-git pull origin master
-bundle
-RAILS_ENV=production rake db:migrate
-rake assets:precompile
-sudo service apache2 restart
