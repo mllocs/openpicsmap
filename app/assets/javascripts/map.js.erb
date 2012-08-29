@@ -77,8 +77,10 @@ var Map = {
         if(self.selectedMarker !== this) {
 
           // popup content
-          var content = "<a href='" + this.pic_image_url + "'><img src='" + this.pic_image_thumb_url + "' alt='image'></img></a>";
+          var content = "<div style='text-align:center'>";
+          content += "<br /><a href='" + this.pic_image_url + "'><img src='" + this.pic_image_thumb_url + "' alt='image'></img></a>";
           content += "<br /><strong>" + this.pic_title + "</strong>";
+          content += "</div>";
 
           if(window.logged_in) {
             content += " · <a href='" + this.edit_pic_path + "'>Edit</a>";
@@ -91,6 +93,8 @@ var Map = {
             content,
             null, 
             false);
+
+          popup.padding = 10;
 
           this.popup = popup;
 
