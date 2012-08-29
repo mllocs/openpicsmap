@@ -36,11 +36,6 @@ group :development do
   gem 'debugger' # To use debugger
 end
 
-group :production do
- gem 'therubyracer'
- gem 'execjs'
-end
-
 gem 'bourbon'
 gem 'haml'
 gem 'geocoder'
