@@ -3,7 +3,7 @@
   - @pics.each do |pic|
     .cell
       .pic
-        = link_to pic.image.url do
+        = link_to pic do
           = image_tag pic.image.url(:medium)
         .caption
           %h4= pic.title

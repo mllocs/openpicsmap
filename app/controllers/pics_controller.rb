@@ -1,6 +1,6 @@
 class PicsController < ApplicationController
 
-  before_filter :authorize, :except => [:index, :map]
+  before_filter :authorize, :except => [:index, :map, :show]
   
   # GET /pics
   # GET /pics.json
@@ -23,6 +23,7 @@ class PicsController < ApplicationController
   # GET /pics/1.json
   def show
     @pic = Pic.find(params[:id])
+    @pics = Pic.all
 
     respond_to do |format|
       format.html # show.html.erb

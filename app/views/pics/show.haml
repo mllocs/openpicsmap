@@ -1,3 +1,32 @@
-.form_container
-  %h1= @pic.title
-  = image_tag @pic.image.url, :class => "full_width"
+#show-pic
+
+  %h1
+    = @pic.title
+    - if current_user
+      = link_to "Edit", edit_pic_path(@pic)
+
+  %table.pic-info
+    %tr
+      %td
+        %ul.details
+          %li
+            = @pic.get_desc
+          %li
+            Uploaded 
+            = distance_of_time_in_words @pic.created_at, Time.now.utc
+            ago
+          %li
+            Taken at
+            = @pic.taken_at.strftime("%d %B %Y");
+      %td
+        %div#show-map{data: { points: @pics.to_json, selected_id: @pic.id }}
+
+
+  = link_to @pic.image.url do
+    = image_tag @pic.image.url, :class => "full_width"
+
+
+:javascript
+  $(document).ready(function() {
+    Map.init("show-map", false);
+  });

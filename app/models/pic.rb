@@ -23,7 +23,8 @@ class Pic < ActiveRecord::Base
     hash.merge!({
       "image_url" => self.image.url,
       "image_thumb_url" => self.image.url(:thumb),
-      "edit_pic_path" => (self.new_record? ? nil : Rails.application.routes.url_helpers.edit_pic_path(self))
+      "edit_pic_path" => (self.new_record? ? nil : Rails.application.routes.url_helpers.edit_pic_path(self)),
+      "show_pic_path" => (self.new_record? ? nil : Rails.application.routes.url_helpers.pic_path(self))
     })
     hash
   end
@@ -34,6 +35,10 @@ class Pic < ActiveRecord::Base
 
   def get_lon
     self.longitude ? self.longitude.round(3) : "undefined"
+  end
+
+  def get_desc
+    (self.description.empty? or self.description.nil?) ? "No description" : self.description
   end
 
   def print_metadata
