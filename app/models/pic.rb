@@ -38,7 +38,11 @@ class Pic < ActiveRecord::Base
   end
 
   def get_desc
-    (self.description.empty? or self.description.nil?) ? "No description" : self.description
+    (self.description.empty? or self.description.nil?) ? "No description." : self.description
+  end
+
+  def get_exif
+    self.metadata.to_s
   end
 
   def print_metadata

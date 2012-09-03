@@ -1,29 +1,31 @@
 #show-pic
 
-  %h1
-    = @pic.title
-    - if current_user
-      = link_to "Edit", edit_pic_path(@pic)
+  #pic-header
+    .pic-info
+      %h1
+        = @pic.title
+        - if current_user
+          = link_to "Edit", edit_pic_path(@pic)
+      %ul.details
+        %li
+          = @pic.get_desc
+        %li.dates
+          Taken at
+          = @pic.taken_at.strftime("%d %B %Y");
+          ·
+          Uploaded 
+          = distance_of_time_in_words @pic.created_at, Time.now.utc
+          ago
 
-  %table.pic-info
-    %tr
-      %td
-        %ul.details
-          %li
-            = @pic.get_desc
-          %li
-            Uploaded 
-            = distance_of_time_in_words @pic.created_at, Time.now.utc
-            ago
-          %li
-            Taken at
-            = @pic.taken_at.strftime("%d %B %Y");
-      %td
-        %div#show-map{data: { points: @pics.to_json, selected_id: @pic.id }}
+    #show-map{data: { points: @pics.to_json, selected_id: @pic.id }}
 
 
   = link_to @pic.image.url do
     = image_tag @pic.image.url, :class => "full_width"
+
+  .metadata
+    Metadata:
+    = @pic.get_exif
 
 
 :javascript
