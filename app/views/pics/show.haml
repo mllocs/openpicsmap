@@ -10,9 +10,10 @@
         %li
           = @pic.get_desc
         %li.dates
-          Taken at
-          = @pic.taken_at.strftime("%d %B %Y");
-          ·
+          - if @pic.taken_at
+            Taken at
+            = @pic.taken_at.strftime("%d %B %Y");
+            ·
           Uploaded 
           = distance_of_time_in_words @pic.created_at, Time.now.utc
           ago

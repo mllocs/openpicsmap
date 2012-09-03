@@ -8,8 +8,9 @@
         .caption
           %h4= pic.title
           .line
-            = "taken at #{pic.taken_at}"
-            ·
+            - if pic.taken_at
+              = "taken at #{pic.taken_at}"
+              ·
             = link_to "Map", map_pics_path(:pic_id => pic.id)
             - if current_user
               ·
