@@ -79,41 +79,45 @@ var Map = {
 
         if(self.selectedMarker !== this) {
 
-          // popup content
-          var content = "<div style='text-align:center'>";
-          content += "<br /><a href='" + this.show_pic_path + "'><img src='" + this.pic_image_thumb_url + "' alt='image'></img></a>";
-          content += "<br /><strong>" + this.pic_title + "</strong>";
-          content += "</div>";
+          if(full) {
+            // popup content
+            var content = "<div style='text-align:center;margin-bottom: 10px'>";
+            content += "<h3>" + this.pic_title + "</h3>";
+            content += "<a href='" + this.show_pic_path + "'><img src='" + this.pic_image_thumb_url + "' alt='image'></img></a>";
+            content += "</div>";
 
-          if(window.logged_in) {
-            content += " · <a href='" + this.edit_pic_path + "'>Edit</a>";
-          }
+            // if(window.logged_in) {
+            //   content += " · <a href='" + this.edit_pic_path + "'>Edit</a>";
+            // }
 
-          popup = new OpenLayers.Popup.FramedCloud(
-            "pic_" + this.pic_id,
-            this.lonlat,
-            null, //new OpenLayers.Size(100, 100),
-            content,
-            null, 
-            false);
+            popup = new OpenLayers.Popup.FramedCloud(
+              "pic_" + this.pic_id,
+              this.lonlat,
+              null, //new OpenLayers.Size(100, 100),
+              content,
+              null, 
+              false);
 
-          popup.padding = 10;
+            popup.padding = 10;
 
-          this.popup = popup;
+            this.popup = popup;
 
-          if(self.selectedMarker) {
-            if(self.selectedMarker.popup) {
-              self.map.removePopup(self.selectedMarker.popup);
+            if(self.selectedMarker) {
+              if(self.selectedMarker.popup) {
+                self.map.removePopup(self.selectedMarker.popup);
+              }
+              self.selectedMarker.setOpacity(self.default_opacity);
             }
-            self.selectedMarker.setOpacity(self.default_opacity);
-          }
-          self.selectedMarker = this;
-          this.setOpacity(1);
-          self.map.addPopup(popup);
-        }
+            self.selectedMarker = this;
+            this.setOpacity(1);
+            self.map.addPopup(popup);
 
-        if(self.new_pic_popup !== null) {
-          self.map.removePopup(self.new_pic_popup);
+            if(self.new_pic_popup !== null) {
+              self.map.removePopup(self.new_pic_popup);
+            }
+
+          // in show view, act as a link
+          } else { window.location.href = this.show_pic_path; }
         }
 
       });

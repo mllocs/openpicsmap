@@ -63,11 +63,17 @@ img.full_width {
 
   #pic-header {
     background-color: #fbfbfb;
-    // padding: 10px 10px 10px 30px;
+    padding: 10px 10px 10px 30px;
     @include clearfix;
-    margin-bottom: 10px;
 
     .pic-info {
+      h1 {
+        a {
+          font-size: 15px;
+          font-weight: normal;
+          font-style: italic;
+        }
+      }
       height: 200px;
       width: 47%;
       float: left;
@@ -96,8 +102,21 @@ img.full_width {
       }
     }
   }
-  img {
-    margin: 15px 0 0;
+  .nav-pic {
+    padding: 15px 0;
+    .next {
+      float: right;
+    }
+    .prev {
+      float: left;
+    }
+  }
+  .img-wrap {
+    margin: 10px 0 0;
+    a {
+      img {
+      }
+    }
   }
   .metadata {
     margin-top: 10px;

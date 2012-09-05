@@ -41,18 +41,22 @@ class Pic < ActiveRecord::Base
     (self.description.empty? or self.description.nil?) ? "No description." : self.description
   end
 
-  def get_exif
-    self.metadata.to_s
+  def next_pic
+    self.class.where("id > ?", id).order("id desc").first
   end
 
-  def print_metadata
-    md = ""
-    hash = YAML::load self.metadata
-    hash.each do |k,v|
-      md += "#{k}: #{v.to_s}, "
-    end
-    md.slice(0..-3) # remove last ", "
+  def prev_pic
+    self.class.where("id < ?", id).order("id desc").first
   end
+
+  # def print_metadata
+  #   md = ""
+  #   hash = YAML::load self.metadata
+  #   hash.each do |k,v|
+  #     md += "#{k}: #{v.to_s}, "
+  #   end
+  #   md.slice(0..-3) # remove last ", "
+  # end
 
   def destroy_image
     self.image.destroy

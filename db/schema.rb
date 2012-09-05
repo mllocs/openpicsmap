@@ -11,12 +11,12 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120826111628) do
+ActiveRecord::Schema.define(:version => 20120905065142) do
 
   create_table "pics", :force => true do |t|
     t.string   "title"
     t.text     "description"
-    t.date     "taken_at"
+    t.datetime "taken_at"
     t.string   "address"
     t.float    "latitude"
     t.float    "longitude"

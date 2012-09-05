@@ -5,7 +5,7 @@
       %h1
         = @pic.title
         - if current_user
-          = link_to "Edit", edit_pic_path(@pic)
+          = link_to "edit", edit_pic_path(@pic), :class => "edit"
       %ul.details
         %li
           = @pic.get_desc
@@ -20,13 +20,17 @@
 
     #show-map{data: { points: @pics.to_json, selected_id: @pic.id }}
 
+  .nav-pic
+    .next= link_to "next >", @pic.next_pic if @pic.next_pic
+    .prev= link_to "< previous", @pic.prev_pic if @pic.prev_pic
 
-  = link_to @pic.image.url do
-    = image_tag @pic.image.url, :class => "full_width"
+  .img-wrap
+    = link_to @pic.image.url do
+      = image_tag @pic.image.url, :class => "full_width"
 
-  .metadata
-    Metadata:
-    = @pic.get_exif
+  / .metadata
+  /   Metadata:
+  /   = @pic.print_metadata(true)
 
 
 :javascript
