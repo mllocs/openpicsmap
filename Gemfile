@@ -36,6 +36,19 @@ group :development do
   gem 'debugger' # To use debugger
 end
 
+group :development, :test do
+  gem 'rspec-rails' # needed in development for the generators
+  gem 'factory_girl_rails'
+end
+
+group :test do
+  gem 'database_cleaner'
+  gem 'faker'
+  gem 'capybara'
+  gem 'guard-rspec'
+  gem 'launchy'
+end
+
 gem 'bourbon'
 gem 'haml'
 gem 'geocoder'

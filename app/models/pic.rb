@@ -63,8 +63,10 @@ class Pic < ActiveRecord::Base
   end
 
   def optimize_jpeg
-    image_dir = File.dirname File.dirname(self.image.path)
-    %x[jpegoptim `find #{image_dir} -name *.JPG`]
+    unless Rails.env == "test"
+      image_dir = File.dirname File.dirname(self.image.path)
+      %x[jpegoptim `find #{image_dir} -name *.JPG`]
+    end
   end
 
 end
