@@ -7,6 +7,10 @@ FactoryGirl.define do
     image File.open('spec/support/sample_photo.jpg')
   end
 
+  factory :invalid_pic, parent: :pic do
+    title nil
+  end
+
   factory :user do
     email Faker::Internet.email
     password "secret"

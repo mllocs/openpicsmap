@@ -2,7 +2,7 @@
 #grid
   - @pics.each do |pic|
     .cell
-      .pic
+      .pic{:id => "pic_#{pic.id}"}
         = link_to pic do
           = image_tag pic.image.url(:medium)
         .caption
@@ -14,6 +14,6 @@
             = link_to "Map", map_pics_path(:pic_id => pic.id)
             - if current_user
               ·
-              = link_to "Edit", edit_pic_path(pic)
+              = link_to "Edit", edit_pic_path(pic), :class => "edit"
               ·
-              = link_to "Delete", pic, :method => :delete, :data => { :confirm => "Are you sure?" }
+              = link_to "Delete", pic, :method => :delete, :data => { :confirm => "Are you sure?" }, :class => "delete"
