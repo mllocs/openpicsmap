@@ -18,7 +18,7 @@
 #grid {
   margin: 40px auto 20px;
   padding: 0;
-  // max-width: 1110px;
+  // max-width: 1481px;
   @include clearfix;
 
   .cell {
@@ -33,7 +33,7 @@
         // max-height: 300px;
         @include box-shadow(2px 2px 2px #444);
         &:hover {
-          @include box-shadow(2px 2px 5px #222);
+          @include box-shadow(4px 3px 6px #222);
         }
       }
       .caption {
