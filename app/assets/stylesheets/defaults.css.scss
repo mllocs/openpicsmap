@@ -1,5 +1,6 @@
 body {
-  @include background-image(radial-gradient(50% 50%, circle cover, #fff, #ccc));
+  background-color: #eee;
+  // @include background-image(radial-gradient(50% 50%, circle cover, #fff, #ccc));
   color: #333;
   font-family: helvetica, sans-serif;
   font-size: 13px;
