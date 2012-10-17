@@ -4,15 +4,17 @@ class Pic < ActiveRecord::Base
   attr_accessible :address, :description, :latitude, :longitude, :taken_at, :title, :image
   #geocoded_by :address
 
-  has_attached_file :image, 
-                    :styles => { :thumb => "100x100>", :medium => "300x300>", :original => "1024x1024" }, 
-                    :processors => [:thumbnail, :metadata] # /lib/paperclip_processors/metadata.rb
+  # has_attached_file :image, 
+  #                   :styles => { :thumb => "100x100>", :medium => "300x300>", :original => "1024x1024" }, 
+  #                   :processors => [:thumbnail, :metadata] # /lib/paperclip_processors/metadata.rb
 
-  validates :image, 
-            :attachment_presence => true, 
-            :attachment_content_type => { :content_type => ['image/jpeg', 'image/jpg'] }
+  # validates :image, 
+  #           :attachment_presence => true, 
+  #           :attachment_content_type => { :content_type => ['image/jpeg', 'image/jpg'] }
             
   validates :title, :presence => true
+
+  # mount_uploader :image, ImageUploader
 
   #after_validation :geocode#, :if => :address_changed?
   after_save :optimize_jpeg, :if => :image_file_name_changed?
