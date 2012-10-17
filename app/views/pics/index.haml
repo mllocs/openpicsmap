@@ -4,7 +4,7 @@
     .cell
       .pic{:id => "pic_#{pic.id}"}
         = link_to pic do
-          = image_tag pic.image.url(:medium)
+          = image_tag pic.image_url(:medium).to_s if pic.image # pic.image.url(:medium)
         .caption
           %h4= pic.title
           .line

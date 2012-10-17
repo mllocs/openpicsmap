@@ -20,3 +20,5 @@ pickle-email-*.html
 # Assuming unchanged
 Capfile
 /config/deploy.rb
+
+.rvmrc

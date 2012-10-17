@@ -13,23 +13,24 @@ class Pic < ActiveRecord::Base
   #           :attachment_content_type => { :content_type => ['image/jpeg', 'image/jpg'] }
             
   validates :title, :presence => true
+  validates :image, :presence => true
 
-  # mount_uploader :image, ImageUploader
+  mount_uploader :image, ImageUploader
 
   #after_validation :geocode#, :if => :address_changed?
-  after_save :optimize_jpeg, :if => :image_file_name_changed?
-  before_destroy :destroy_image
+  # after_save :optimize_jpeg, :if => :image_changed?
+  # before_destroy :destroy_image
 
-  def as_json(options = { })
-    hash = super(options) || {}
-    hash.merge!({
-      "image_url" => self.image.url,
-      "image_thumb_url" => self.image.url(:thumb),
-      "edit_pic_path" => (self.new_record? ? nil : Rails.application.routes.url_helpers.edit_pic_path(self)),
-      "show_pic_path" => (self.new_record? ? nil : Rails.application.routes.url_helpers.pic_path(self))
-    })
-    hash
-  end
+  # def as_json(options = { })
+  #   hash = super(options) || {}
+  #   hash.merge!({
+  #     "image_url" => self.image.url,
+  #     "image_thumb_url" => self.image.url(:thumb),
+  #     "edit_pic_path" => (self.new_record? ? nil : Rails.application.routes.url_helpers.edit_pic_path(self)),
+  #     "show_pic_path" => (self.new_record? ? nil : Rails.application.routes.url_helpers.pic_path(self))
+  #   })
+  #   hash
+  # end
 
   def get_lat
     self.latitude ? self.latitude.round(3) : "undefined"
@@ -60,13 +61,13 @@ class Pic < ActiveRecord::Base
   #   md.slice(0..-3) # remove last ", "
   # end
 
-  def destroy_image
-    self.image.destroy
-  end
+  # def destroy_image
+  #   self.image.destroy
+  # end
 
   def optimize_jpeg
     unless Rails.env == "test"
-      image_dir = File.dirname File.dirname(self.image.path)
+      image_dir = File.dirname File.dirname(self.image_path)
       %x[jpegoptim `find #{image_dir} -name *.JPG`]
     end
   end

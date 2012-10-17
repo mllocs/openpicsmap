@@ -34,6 +34,9 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 group :development do
   gem 'capistrano' # Deploy with Capistrano
   gem 'debugger' # To use debugger
+  gem 'rb-inotify', :require => false
+  gem 'guard-rspec'
+  gem 'guard-livereload'
 end
 
 group :development, :test do
@@ -45,14 +48,13 @@ group :test do
   gem 'database_cleaner'
   gem 'faker'
   gem 'capybara'
-  gem 'guard-rspec'
   gem 'launchy'
 end
 
 gem 'bourbon'
 gem 'haml'
 gem 'geocoder'
-gem 'paperclip'
+# gem 'paperclip'
 gem 'carrierwave'
 gem 'rmagick'
 gem 'exifr'
