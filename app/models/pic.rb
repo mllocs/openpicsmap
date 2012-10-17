@@ -1,36 +1,30 @@
 require "yaml"
 
 class Pic < ActiveRecord::Base
+
   attr_accessible :address, :description, :latitude, :longitude, :taken_at, :title, :image
-  #geocoded_by :address
+  # geocoded_by :address
 
-  # has_attached_file :image, 
-  #                   :styles => { :thumb => "100x100>", :medium => "300x300>", :original => "1024x1024" }, 
-  #                   :processors => [:thumbnail, :metadata] # /lib/paperclip_processors/metadata.rb
-
-  # validates :image, 
-  #           :attachment_presence => true, 
-  #           :attachment_content_type => { :content_type => ['image/jpeg', 'image/jpg'] }
-            
   validates :title, :presence => true
   validates :image, :presence => true
 
   mount_uploader :image, ImageUploader
 
-  #after_validation :geocode#, :if => :address_changed?
-  after_save :optimize_jpeg, :if => :image_changed?
+  # after_validation :geocode, :if => :address_changed?
+  before_save :parse_exif, :if => :image_changed?
+  # after_save :optimize_jpeg, :if => :image_changed? 
   before_destroy :destroy_image
 
-  # def as_json(options = { })
-  #   hash = super(options) || {}
-  #   hash.merge!({
-  #     "image_url" => self.image.url,
-  #     "image_thumb_url" => self.image.url(:thumb),
-  #     "edit_pic_path" => (self.new_record? ? nil : Rails.application.routes.url_helpers.edit_pic_path(self)),
-  #     "show_pic_path" => (self.new_record? ? nil : Rails.application.routes.url_helpers.pic_path(self))
-  #   })
-  #   hash
-  # end
+  def as_json(options = { })
+    hash = super(options) || {}
+    hash.merge!({
+      "image_url" => self.image_url,
+      "image_thumb_url" => self.image_url(:thumb),
+      "edit_pic_path" => (self.new_record? ? nil : Rails.application.routes.url_helpers.edit_pic_path(self)),
+      "show_pic_path" => (self.new_record? ? nil : Rails.application.routes.url_helpers.pic_path(self))
+    })
+    hash
+  end
 
   def get_lat
     self.latitude ? self.latitude.round(3) : "undefined"
@@ -65,11 +59,24 @@ class Pic < ActiveRecord::Base
     self.remove_image!
   end
 
-  def optimize_jpeg
-    unless Rails.env == "test"
-      image_dir = File.dirname File.dirname(self.image_path)
-      %x[jpegoptim `find #{image_dir} -name *.JPG`]
-    end
+  # def optimize_jpeg
+  #   unless Rails.env == "test"
+  #     image_dir = File.dirname File.dirname(self.image_path)
+  #     %x[jpegoptim `find #{image_dir} -name *.JPG`]
+  #   end
+  # end
+
+  def parse_exif
+    exif = EXIFR::JPEG.new(image.path)
+    self.taken_at = exif.date_time
+
+    self.metadata = {
+      width: exif.width,
+      height: exif.height,
+      model: exif.model,
+      exposure_time: exif.exposure_time.to_s,
+      f_number: exif.f_number.to_f
+    }
   end
 
 end
