@@ -18,8 +18,8 @@ class Pic < ActiveRecord::Base
   mount_uploader :image, ImageUploader
 
   #after_validation :geocode#, :if => :address_changed?
-  # after_save :optimize_jpeg, :if => :image_changed?
-  # before_destroy :destroy_image
+  after_save :optimize_jpeg, :if => :image_changed?
+  before_destroy :destroy_image
 
   # def as_json(options = { })
   #   hash = super(options) || {}
@@ -61,9 +61,9 @@ class Pic < ActiveRecord::Base
   #   md.slice(0..-3) # remove last ", "
   # end
 
-  # def destroy_image
-  #   self.image.destroy
-  # end
+  def destroy_image
+    self.remove_image!
+  end
 
   def optimize_jpeg
     unless Rails.env == "test"
