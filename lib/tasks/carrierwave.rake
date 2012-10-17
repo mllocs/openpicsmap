@@ -1,15 +1,17 @@
-namespace :paperclip do
+namespace :carrierwave do
 
-  # desc "Migrates from paperclip to carrierwave"
-  # task :migrate_table => :environment do
-  #   FileUtils.mkdir_p Rails.root.join('public', 'uploads')
+  desc "Migrates from paperclip to carrierwave"
+  task :migrate_table => :environment do
+    # FileUtils.mkdir_p Rails.root.join('public', 'uploads')
 
-  #   Pic.where('image_file_name IS NOT NULL').each do |pic|
-  #     filepath = Rails.root.join('public', 'system', 'images', pic.id.to_s, 'original', pic.image_file_name)
-  #     pic.image = File.open(filepath) if File.exists?(filepath)
-  #     pic.save!
-  #   end
-  # end
+    Pic.all.each do |pic|
+      # filepath = Rails.root.join('public', 'system', 'images', pic.id.to_s, 'original', pic.image_file_name)
+      # pic.image = File.open(filepath) if File.exists?(filepath)
+      puts "updating #{pic.id}"
+      pic.image = pic.image_file_name
+      pic.save!
+    end
+  end
 
   desc "Migrates from paperclip to carrierwave"
   task :migrate_files => :environment do
