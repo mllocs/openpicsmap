@@ -10,10 +10,6 @@ describe Pic do
     pic = FactoryGirl.build(:pic).should be_valid
   end
 
-  it "is invalid without a title" do
-    pic = FactoryGirl.build(:pic, :title => nil).should_not be_valid
-  end
-
   it "is invalid without an image" do
     pic = FactoryGirl.build(:pic, :image => nil).should_not be_valid
   end

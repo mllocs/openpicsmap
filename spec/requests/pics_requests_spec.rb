@@ -66,11 +66,10 @@ describe "Pics requests" do
       page.should have_content("Test image")
     end
     
-    it "give you an error if you dont provide title or attached file" do
+    it "give you an error if you dont provide attached file" do
       visit "/pics/new"
       click_button "Create Pic"
       page.should have_content("Image can't be blank")
-      page.should have_content("Title can't be blank")
     end
   end
 end
