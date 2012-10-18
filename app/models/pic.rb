@@ -13,7 +13,7 @@ class Pic < ActiveRecord::Base
   # after_validation :geocode, :if => :address_changed?
   before_save :parse_exif, :if => :image_changed?
   before_destroy :destroy_image
-  before_create :default_name
+  before_create :default_title
   
   def default_title
     self.title ||= File.basename(image.filename, '.*').titleize if image
