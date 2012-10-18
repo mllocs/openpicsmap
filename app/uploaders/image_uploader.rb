@@ -45,7 +45,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   # Piet optimization
   process :optimize
 
-  # My piet receipe
+  # My piet optimize recipe
   def optimize
     manipulate! do |img|
       Piet.optimize(current_path)
