@@ -12,8 +12,12 @@ class Pic < ActiveRecord::Base
 
   # after_validation :geocode, :if => :address_changed?
   before_save :parse_exif, :if => :image_changed?
-  # after_save :optimize_jpeg, :if => :image_changed? 
   before_destroy :destroy_image
+  before_create :default_name
+  
+  def default_title
+    self.title ||= File.basename(image.filename, '.*').titleize if image
+  end
 
   def as_json(options = { })
     hash = super(options) || {}
@@ -58,13 +62,6 @@ class Pic < ActiveRecord::Base
   def destroy_image
     self.remove_image!
   end
-
-  # def optimize_jpeg
-  #   unless Rails.env == "test"
-  #     image_dir = File.dirname File.dirname(self.image_path)
-  #     %x[jpegoptim `find #{image_dir} -name *.JPG`]
-  #   end
-  # end
 
   def parse_exif
     exif = EXIFR::JPEG.new(image.path)
