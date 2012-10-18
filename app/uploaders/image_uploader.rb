@@ -10,6 +10,8 @@ class ImageUploader < CarrierWave::Uploader::Base
   # include Sprockets::Helpers::RailsHelper
   # include Sprockets::Helpers::IsolatedHelper
 
+  # include Piet::CarrierWaveExtension
+
   # Choose what kind of storage to use for this uploader:
   storage :file
   # storage :fog
@@ -38,6 +40,17 @@ class ImageUploader < CarrierWave::Uploader::Base
 
   version :medium do
     process :resize_to_limit => [300, 300]
+  end
+
+  # Piet optimization
+  process :optimize
+
+  # My piet receipe
+  def optimize
+    manipulate! do |img|
+      Piet.optimize(current_path)
+      img
+    end
   end
 
   # Add a white list of extensions which are allowed to be uploaded.

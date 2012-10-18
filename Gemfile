@@ -54,7 +54,7 @@ end
 gem 'bourbon'
 gem 'haml'
 gem 'geocoder'
-# gem 'paperclip'
 gem 'carrierwave'
+gem 'piet'
 gem 'rmagick'
 gem 'exifr'
