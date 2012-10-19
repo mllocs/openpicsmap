@@ -33,7 +33,7 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 
 group :development do
   gem 'capistrano' # Deploy with Capistrano
-  gem 'debugger' # To use debugger
+  # gem 'debugger' # To use debugger
   gem 'rb-inotify', :require => false
   gem 'guard-rspec'
   gem 'guard-livereload'
