@@ -18,6 +18,14 @@ class Pic < ActiveRecord::Base
     self.title = File.basename(image.filename, '.*').titleize if image and (title.nil? or title.empty?)
   end
 
+  def full_description
+    if description.nil? or description.empty?
+      self.title
+    else
+      [self.title, self.description].join(" -- ")
+    end
+  end
+
   def as_json(options = { })
     hash = super(options) || {}
     hash.merge!({

@@ -10,6 +10,7 @@ class PicsController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @pics }
+      format.atom { render layout: false }
     end
   end
 
