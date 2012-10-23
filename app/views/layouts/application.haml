@@ -5,6 +5,7 @@
     = stylesheet_link_tag    "application", :media => "all"
     = javascript_include_tag "application", "http://www.openlayers.org/api/OpenLayers.js"
     = javascript_tag "window.logged_in = #{current_user ? 1 : 0};" # just for map functions
+    = auto_discovery_link_tag :atom, "/pics.atom"
     = csrf_meta_tags
   %body
     #nav= render "shared/nav"
