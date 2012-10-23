@@ -16,7 +16,7 @@
       %br
       = f.file_field :image
     - else
-      = image_tag @pic.image(:medium)
+      = image_tag @pic.image.url(:medium)
 
   .field
     = f.label :title
