@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "Pics requests" do
+describe "Pics features" do
 
   describe "Gallery page" do
 
@@ -16,7 +16,7 @@ describe "Pics requests" do
       it "displays pics links to show and map" do
         visit "/pics"
         Pic.all.each do |p|
-          page.should have_css("a[href=#{pic_path(p)}]") # page.should have_selector "a[href$='#{pic_path(p)}']"
+          page.should have_css("a[href='#{pic_path(p)}']")
           page.should have_link("Map", :href => map_pics_path(:pic_id => p.id))
         end
       end
@@ -31,13 +31,13 @@ describe "Pics requests" do
 
     context "logged in" do
       before do
-        request_login
+        user_login
         @pic = FactoryGirl.create(:pic)
       end
 
       it "shows Edit and Delete links" do
         visit "/pics"
-        within "div.pic" do
+        within "#pic_#{@pic.id}" do
           page.should have_link("Edit")
           page.should have_link("Delete")
         end
@@ -50,10 +50,10 @@ describe "Pics requests" do
     end
   end
 
-  describe "New pic page" do 
+  describe "New pic page" do
 
     before do
-      request_login
+      user_login
     end
 
     it "let you create a pic with title and attached file" do
@@ -62,10 +62,10 @@ describe "Pics requests" do
       fill_in "Title", :with => "Test image"
       click_button "Create Pic"
       visit "/pics"
-      Pic.find_by_title("Test image").should_not be_nil
+      expect{Pic.find_by_title("Test image")}.to_not be_nil
       page.should have_content("Test image")
     end
-    
+
     it "give you an error if you dont provide attached file" do
       visit "/pics/new"
       click_button "Create Pic"
