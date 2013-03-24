@@ -1,185 +1,263 @@
-var Map = {
+(function () {
 
-  map: null,
-  div_id: null,
-  selectedMarker: null,
-  selectControl: null,
-  markers: null,
-  new_pic_popup: null,
-  default_opacity: 0.4,
+  var Map;
 
-  init_form: function(div_id) {
+  Map = {
+    default_opacity: 0.4
+  , map: null
+  , div_id: null
+  , selectedMarker: null
+  , selectControl: null
+  , markers: null
+  , new_pic_popup: null
+  };
 
+  /* Default Map initialization
+   * @param [String] div_id
+   * @param [Boolean] is_full
+   */
+  Map.default_init = function (div_id, is_full) {
+
+    this.div_id = div_id;
+    this.is_full = !!is_full;
+
+    // create the map
+    this.map = new OpenLayers.Map(this.div_id);
+
+    // create and add the layers and controls
+    this.markers = new OpenLayers.Layer.Markers("Markers");
+    this.map.addLayers([new OpenLayers.Layer.OSM(), this.markers]);
+  };
+
+  /* Initialize the map
+   * @param [String] div_id
+   * @param [Boolean] isfull
+   */
+  Map.init = function (div_id, is_full) {
+    // default initialization
+    this.default_init(div_id, is_full);
+
+    var points = $("#" + this.div_id).data("points");
+
+    // Create the markers
+    _.each(points, this.draw_point, this);
+
+    // Map click event
+    this.map.events.register("click", this, this.on_full_map_click);
+
+    // window and map rendering
+    this.handle_window_resize();
+    this.handle_map_center();
+    this.map.updateSize();
+  };
+
+  /* Initialize the map in the form
+   * @param [String] div_id
+   */
+  Map.init_form = function (div_id) {
     // default initialization
     this.default_init(div_id);
 
     // get the point
-    var point = $("#" + this.div_id).data("point");
-    var marker = this.add_marker(point);
-    var zoom = 6;
+    var point = $("#" + this.div_id).data("point")
+      , marker = this.add_marker(point)
+      , zoom = 1;
 
     // set center
-    if(!this.valid_point(point)) {
-      zoom = 1;
+    if (this.is_valid_point(point)) {
+      zoom = 6;
     }
 
+    // Set the marker and center
     this.map.setCenter(marker.lonlat, zoom);
     this.selectedMarker = marker;
 
-    this.map.events.register("click", this, function(e) {
+    // register on clicking the map
+    this.map.events.register("click", this, this.on_form_map_click);
+  };
 
-      var lonLat = this.map.getLonLatFromViewPortPx(e.xy);
-      px = this.map.getLayerPxFromViewPortPx(e.xy);
-      this.selectedMarker.moveTo(px);
+  /* Handle the click in the full map
+   */
+  Map.on_full_map_click = function (event) {
+    // If some active marker
+    if (this.selectedMarker) {
+      this.reset_selected_maker();
 
-      lonLat.transform(
-        this.map.getProjectionObject(), // to Spherical Mercator Projection
-        new OpenLayers.Projection("EPSG:4326") // transform from WGS 1984
-      );
-      $("#pic_latitude").val(lonLat.lat);
-      $("#pic_longitude").val(lonLat.lon);
+    } else if (window.logged_in) {
+      this.draw_new_pic_popup(event);
+    }
+  };
+
+  /* Handle the click in the form's map
+   */
+  Map.on_form_map_click = function (event) {
+
+    var lonLat = this.map.getLonLatFromViewPortPx(event.xy)
+      , px = this.map.getLayerPxFromViewPortPx(event.xy);
+
+    this.selectedMarker.moveTo(px);
+
+    lonLat.transform(
+      this.map.getProjectionObject(), // to Spherical Mercator Projection
+      new OpenLayers.Projection("EPSG:4326") // transform from WGS 1984
+    );
+
+    // set the form values
+    $(".js-pic-latitude").val(lonLat.lat);
+    $(".js-pic-longitude").val(lonLat.lon);
+  };
+
+  /* Create the pic popup
+   * @param [<Marker>] marker
+   * @return [<Popup>]
+   */
+  Map.create_pic_popup = function (marker) {
+
+    var popup
+      , content;
+
+    // popup content
+    content = "<div style='text-align:center;margin-bottom: 10px'>";
+    content += "<h3>" + marker.pic_title + "</h3>";
+    content += "<a href='" + marker.show_pic_path + "'>" +
+               "<img src='" + marker.pic_image_thumb_url + "' alt='image'></img></a>";
+    content += "</div>";
+
+    // if(window.logged_in) {
+    //   content += " · <a href='" + marker.edit_pic_path + "'>Edit</a>";
+    // }
+
+    popup = new OpenLayers.Popup.FramedCloud(
+      "pic_" + marker.pic_id
+    , marker.lonlat
+    , null // new OpenLayers.Size(100, 100),
+    , content
+    , null
+    , false
+    );
+
+    popup.padding = 10;
+    marker.popup = popup;
+
+    return popup;
+  };
+
+  /* Draws the point (maker) in the map
+   * @param [<Point>] point
+   */
+  Map.draw_point = function (point) {
+
+    // Add point marker to the layer
+    var marker = this.add_marker(point)
+      , selected_id = $("#" + this.div_id).data("selected_id")
+      , self = this
+      , popup;
+
+    // Handle selected marker
+    if (point.id === selected_id) {
+      this.selectedMarker = marker;
+      this.selectedMarker.setOpacity(1);
+    }
+
+    marker.events.register("click", marker, function () {
+
+      if (self.selectedMarker !== this) {
+        if (self.is_full) {
+          if (self.selectedMarker) {
+            self.reset_selected_maker();
+          }
+
+          popup = self.create_pic_popup(this);
+          self.map.addPopup(popup);
+
+          self.selectedMarker = this;
+          this.setOpacity(1);
+
+          if (self.new_pic_popup) {
+            self.map.removePopup(self.new_pic_popup);
+          }
+        // in show view, act as a link
+        } else { window.location.href = this.show_pic_path; }
+      }
 
     });
 
-  },
+    marker.events.register("mouseover", marker, function () {
+      this.setOpacity(1);
+    });
 
-  init: function(div_id, full) {
+    marker.events.register("mouseout", marker, function () {
+      if (self.selectedMarker !== this) {
+        this.setOpacity(self.default_opacity);
+      }
+    });
+  };
 
+  /* Reset the selected marker popup
+   */
+  Map.reset_selected_maker = function () {
+    if (this.selectedMarker.popup) {
+      this.map.removePopup(this.selectedMarker.popup);
+    }
+    this.selectedMarker.setOpacity(this.default_opacity);
+    this.selectedMarker = null;
+  };
+
+  /* Draw new pic popup
+   * @param [<Event>] event
+   */
+  Map.draw_new_pic_popup = function (event) {
+
+    var lonLat = this.map.getLonLatFromViewPortPx(event.xy)
+      , customLonLat = this.map.getLonLatFromViewPortPx(event.xy);
+
+    // Remove new pic popup if any
+    if (this.new_pic_popup) {
+      this.map.removePopup(this.new_pic_popup);
+    }
+
+    customLonLat.transform(
+      this.map.getProjectionObject(), // to Spherical Mercator Projection
+      new OpenLayers.Projection("EPSG:4326") // transform from WGS 1984
+    );
+
+    // Create new_pic popup
+    this.new_pic_popup = new OpenLayers.Popup.FramedCloud(
+      "new_pic_popup"
+    , lonLat
+    , null //new OpenLayers.Size(100, 100),
+    , "<a href='/pics/new?lon=" + customLonLat.lon + "&lat=" + customLonLat.lat + "'>New Pic</a>"
+    , null
+    , true);
+    this.map.addPopup(this.new_pic_popup);
+  };
+
+  /* Resize the map in the full window view
+  */
+  Map.handle_window_resize = function () {
     var self = this;
 
-    // default initialization
-    this.default_init(div_id);
-
-    if(full === true) {
+    if (this.is_full === true) {
       // resize map to get full height
       $("#" + this.div_id).height($(window).innerHeight() - 52);
 
-      window.onresize = function() {
+      window.onresize = function () {
         $("#" + self.div_id).height($(window).innerHeight() - 52);
         self.map.updateSize();
       };
     }
+  };
 
-    // get data from the map div
-    var points = $("#" + this.div_id).data("points");
-    var selected_id = $("#" + this.div_id).data("selected_id");
+  /* Set the map center
+   */
+  Map.handle_map_center = function () {
 
-    // draw the points
-    for(var i = 0; i < points.length; i++) {
-
-      // Add point marker to the layer
-      var marker = this.add_marker(points[i]);
-
-      if(points[i].id === selected_id) {
-        this.selectedMarker = marker;
-        this.selectedMarker.setOpacity(1);
-      }
-
-      marker.events.register("click", marker, function(e) {
-
-        if(self.selectedMarker !== this) {
-
-          if(full) {
-            // popup content
-            var content = "<div style='text-align:center;margin-bottom: 10px'>";
-            content += "<h3>" + this.pic_title + "</h3>";
-            content += "<a href='" + this.show_pic_path + "'><img src='" + this.pic_image_thumb_url + "' alt='image'></img></a>";
-            content += "</div>";
-
-            // if(window.logged_in) {
-            //   content += " · <a href='" + this.edit_pic_path + "'>Edit</a>";
-            // }
-
-            popup = new OpenLayers.Popup.FramedCloud(
-              "pic_" + this.pic_id,
-              this.lonlat,
-              null, //new OpenLayers.Size(100, 100),
-              content,
-              null, 
-              false);
-
-            popup.padding = 10;
-
-            this.popup = popup;
-
-            if(self.selectedMarker) {
-              if(self.selectedMarker.popup) {
-                self.map.removePopup(self.selectedMarker.popup);
-              }
-              self.selectedMarker.setOpacity(self.default_opacity);
-            }
-            self.selectedMarker = this;
-            this.setOpacity(1);
-            self.map.addPopup(popup);
-
-            if(self.new_pic_popup !== null) {
-              self.map.removePopup(self.new_pic_popup);
-            }
-
-          // in show view, act as a link
-          } else { window.location.href = this.show_pic_path; }
-        }
-
-      });
-
-      marker.events.register("mouseover", marker, function(e) {
-        this.setOpacity(1);
-      });
-
-      marker.events.register("mouseout", marker, function(e) {
-        if(self.selectedMarker !== this) {
-          this.setOpacity(self.default_opacity);
-        }
-      });
-    }
-
-
-    this.map.events.register("click", this, function(e) {
-
-      // If some active marker
-      if(this.selectedMarker !== null) {
-        if(this.selectedMarker.popup) {
-          this.map.removePopup(this.selectedMarker.popup);
-        }
-        this.selectedMarker.setOpacity(this.default_opacity);
-        this.selectedMarker = null;
-      } else {
-
-        if(window.logged_in) {
-          // Remove new pic popup if any
-          if(this.new_pic_popup) {
-            this.map.removePopup(this.new_pic_popup);
-          }
-
-          // convert lonlat
-          var lonLat = this.map.getLonLatFromViewPortPx(e.xy);
-
-          var customLonLat = this.map.getLonLatFromViewPortPx(e.xy);
-
-          customLonLat.transform(
-            this.map.getProjectionObject(), // to Spherical Mercator Projection
-            new OpenLayers.Projection("EPSG:4326") // transform from WGS 1984
-          );
-
-          // Create new_pic popup
-          this.new_pic_popup = new OpenLayers.Popup.FramedCloud(
-            "new_pic_popup",
-            lonLat,
-            null, //new OpenLayers.Size(100, 100),
-            "<a href='/pics/new?lon=" + customLonLat.lon + "&lat=" + customLonLat.lat + "'>New Pic</a>",
-            null, 
-            true);
-          this.map.addPopup(this.new_pic_popup);
-        }
-      }
-    });
+    var zoom = 4;
 
     // set map center
-    if(this.selectedMarker) {
-      if(full === true) {
+    if (this.selectedMarker) {
+      if (this.is_full === true) {
         zoom = 10;
-      } else {
-        zoom = 4;
       }
       this.map.setCenter(this.selectedMarker.lonlat, zoom);
 
@@ -189,63 +267,71 @@ var Map = {
         this.map.getProjectionObject() // to Spherical Mercator Projection
       ), 3);
     }
+  };
 
-    this.map.updateSize();
-
-  },
-
-  default_init: function(div_id) {
-
-    // set div_id
-    this.div_id = div_id;
-
-    // create the map 
-    this.map = new OpenLayers.Map(this.div_id);
-
-    // create and add the layers and controls
-    this.markers = new OpenLayers.Layer.Markers("Markers");
-    this.map.addLayers([new OpenLayers.Layer.OSM(), this.markers]);
-
-  },
-
-  create_lonLat: function(lon, lat) {
+  /* Create an OpenLayers.LonLat object from lon lat values
+   * @param [Float] lon
+   * @param [Float] lat
+   * @return [<LonLat>]
+   */
+  Map.create_lonLat = function (lon, lat) {
     var lonLat = new OpenLayers.LonLat(lon, lat);
     lonLat.transform(
       new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
       this.map.getProjectionObject() // to Spherical Mercator Projection
     );
     return lonLat;
-  },
+  };
 
-  add_marker: function(point) {
+  /* Draw a pointer in the map
+   * @param [<Point>]
+   * @return [<Marker>]
+   */
+  Map.add_marker = function (point) {
+
+    var lonLat
+      , marker
+      , marker_properties
+      , size   = new OpenLayers.Size(25, 25)
+      , offset = new OpenLayers.Pixel(-(size.w / 2), - size.h)
+      , icon   = new OpenLayers.Icon("<%= asset_path('marker.png') %>", size, offset);
 
     // set default markers attributes
-    if(this.valid_point(point)) {
-      var lonLat = this.create_lonLat(point.longitude, point.latitude);
+    if (this.is_valid_point(point)) {
+      lonLat = this.create_lonLat(point.longitude, point.latitude);
     } else {
-      var lonLat = this.create_lonLat(0, 0);
+      lonLat = this.create_lonLat(0, 0);
     }
 
-    // set the image icon
-    var size = new OpenLayers.Size(25, 25);
-    var offset = new OpenLayers.Pixel(-(size.w/2), - size.h);
-    var icon = new OpenLayers.Icon("<%= asset_path('marker.png') %>", size, offset);
+    marker_properties = {
+      pic_image_thumb_url : point.image_thumb_url
+    , pic_image_url       : point.image_url
+    , edit_pic_path       : point.edit_pic_path
+    , show_pic_path       : point.show_pic_path
+    , pic_id              : point.id
+    , pic_title           : point.title
+    , map                 : this.map
+    };
 
-    // create the marker                                  
-    var marker = new OpenLayers.Marker(lonLat, icon);
-    marker.pic_image_thumb_url = point.image_thumb_url;
-    marker.pic_image_url = point.image_url;
-    marker.edit_pic_path = point.edit_pic_path;
-    marker.show_pic_path = point.show_pic_path;
-    marker.pic_id = point.id
-    marker.pic_title = point.title
-    marker.map = this.map;
+    // create the marker
+    marker = new OpenLayers.Marker(lonLat, icon);
+    marker = _.extend(marker, marker_properties);
+
     marker.setOpacity(this.default_opacity);
     this.markers.addMarker(marker);
-    return marker;
-  },
 
-  valid_point: function(point) {
-    return isNumber(point.latitude) && isNumber(point.longitude);
-  }
-};
+    return marker;
+  };
+
+  /* Check if the passed point is valid
+   * @param [<Point>] point
+   * @return [Boolean]
+   */
+  Map.is_valid_point = function (point) {
+    return _.isNumber(point.latitude) && _.isNumber(point.longitude);
+  };
+
+  // Expose
+  OPM.Map = Map;
+
+})();
