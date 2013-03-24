@@ -11,6 +11,8 @@ Features:
 * Optimize the images with [piet gem](https://github.com/albertbellonch/piet).
 * Geolocate and visualize your pics in [Open Street Map](http://openstreetmap.org).
 
+Sample: [http://opm.mcolls.net](http://opm.mcolls.net)
+
 ---
 
 Open Pics Map
