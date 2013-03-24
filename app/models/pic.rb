@@ -13,7 +13,7 @@ class Pic < ActiveRecord::Base
   before_create :default_title
   before_save :parse_exif, :if => :image_changed?
   before_destroy :destroy_image
-  
+
   def default_title
     self.title = File.basename(image.filename, '.*').titleize if image and (title.nil? or title.empty?)
   end

@@ -1,10 +1,10 @@
 class UsersController < ApplicationController
-  
+
   def new
     redirect_to(root_url, :notice => "No more users allowed.") if User.all.size >= User::MAX_USERS
     @user = User.new
   end
-  
+
   def create
     @user = User.new(params[:user])
     if @user.save

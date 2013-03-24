@@ -1,7 +1,7 @@
 class PicsController < ApplicationController
 
   before_filter :authorize, :except => [:index, :map, :show]
-  
+
   # GET /pics
   # GET /pics.json
   def index
@@ -19,7 +19,7 @@ class PicsController < ApplicationController
     @pics = Pic.all
     @selected_pic_id = params[:pic_id]
   end
-  
+
   # GET /pics/1
   # GET /pics/1.json
   def show
@@ -93,5 +93,4 @@ class PicsController < ApplicationController
       format.json { head :no_content }
     end
   end
-
 end
