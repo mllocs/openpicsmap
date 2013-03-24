@@ -14,7 +14,7 @@
             Taken at
             = @pic.taken_at.strftime("%d %B %Y");
             ·
-          Uploaded 
+          Uploaded
           = distance_of_time_in_words @pic.created_at, Time.now.utc
           ago
 
@@ -32,8 +32,7 @@
   /   Metadata:
   /   = @pic.print_metadata(true)
 
-
 :javascript
   $(document).ready(function() {
-    Map.init("show-map", false);
+    OPM.Map.init("show-map", false);
   });

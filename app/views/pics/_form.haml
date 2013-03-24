@@ -33,12 +33,12 @@
       = f.label :taken_at
       %br
       = f.date_select :taken_at
-      
+
   / .field
   /   = f.label :address
   /   %br/
   /   = f.text_field :address
-  
+
   %br
   %div#form_map{data: { point: @pic.to_json }}
 
@@ -46,16 +46,16 @@
   .field
     = f.label :latitude
     %br
-    = f.text_field :latitude, :size => 12, :readonly => :readonly
+    = f.text_field :latitude, :class => 'js-pic-latitude', :size => 12, :readonly => :readonly
   .field
     = f.label :longitude
     %br
-    = f.text_field :longitude, :size => 12, :readonly => :readonly
+    = f.text_field :longitude, :class => 'js-pic-longitude', :size => 12, :readonly => :readonly
 
   .actions
     = f.submit
 
 :javascript
   $(document).ready(function() {
-    Map.init_form("form_map");
+    OPM.Map.init_form("form_map");
   });
