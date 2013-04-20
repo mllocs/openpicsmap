@@ -1,3 +1,6 @@
+/**
+ * Handles an OpenLayers.Map
+ */
 (function () {
 
   var Map;
@@ -12,9 +15,11 @@
   , new_pic_popup: null
   };
 
-  /* Default Map initialization
-   * @param [String] div_id
-   * @param [Boolean] is_full
+  /**
+   * Default Map initialization
+   *
+   * @param {String} div_id
+   * @param {Boolean} is_full
    */
   Map.default_init = function (div_id, is_full) {
 
@@ -29,9 +34,11 @@
     this.map.addLayers([new OpenLayers.Layer.OSM(), this.markers]);
   };
 
-  /* Initialize the map
-   * @param [String] div_id
-   * @param [Boolean] isfull
+  /**
+   * Map initialization
+   *
+   * @param {String} div_id
+   * @param {Boolean} isfull
    */
   Map.init = function (div_id, is_full) {
     // default initialization
@@ -51,8 +58,10 @@
     this.map.updateSize();
   };
 
-  /* Initialize the map in the form
-   * @param [String] div_id
+  /**
+   * Form Map initialization
+   *
+   * @param {String} div_id
    */
   Map.init_form = function (div_id) {
     // default initialization
@@ -76,7 +85,8 @@
     this.map.events.register("click", this, this.on_form_map_click);
   };
 
-  /* Handle the click in the full map
+  /**
+   * Handle the click in the full map
    */
   Map.on_full_map_click = function (event) {
     // If some active marker
@@ -88,7 +98,8 @@
     }
   };
 
-  /* Handle the click in the form's map
+  /**
+   * Handle the click in the form's map
    */
   Map.on_form_map_click = function (event) {
 
@@ -107,14 +118,14 @@
     $(".js-pic-longitude").val(lonLat.lon);
   };
 
-  /* Create the pic popup
-   * @param [<Marker>] marker
-   * @return [<Popup>]
+  /**
+   * Creates the picture popup
+   *
+   * @param {Marker} marker
+   * @return {Popup}
    */
   Map.create_pic_popup = function (marker) {
-
-    var popup
-      , content;
+    var popup, content;
 
     // popup content
     content = "<div style='text-align:center;margin-bottom: 10px'>";
@@ -142,11 +153,12 @@
     return popup;
   };
 
-  /* Draws the point (maker) in the map
-   * @param [<Point>] point
+  /**
+   * Draws the point (Marker) in the map
+   *
+   * @param {Point} point
    */
   Map.draw_point = function (point) {
-
     // Add point marker to the layer
     var marker = this.add_marker(point)
       , selected_id = $("#" + this.div_id).data("selected_id")
@@ -160,7 +172,6 @@
     }
 
     marker.events.register("click", marker, function () {
-
       if (self.selectedMarker !== this) {
         if (self.is_full) {
           if (self.selectedMarker) {
@@ -179,7 +190,6 @@
         // in show view, act as a link
         } else { window.location.href = this.show_pic_path; }
       }
-
     });
 
     marker.events.register("mouseover", marker, function () {
@@ -193,7 +203,8 @@
     });
   };
 
-  /* Reset the selected marker popup
+  /**
+   * Resets the selected marker popup
    */
   Map.reset_selected_maker = function () {
     if (this.selectedMarker.popup) {
@@ -203,11 +214,12 @@
     this.selectedMarker = null;
   };
 
-  /* Draw new pic popup
-   * @param [<Event>] event
+  /**
+   * Draws new pic popup
+   *
+   * @param {Event} event
    */
   Map.draw_new_pic_popup = function (event) {
-
     var lonLat = this.map.getLonLatFromViewPortPx(event.xy)
       , customLonLat = this.map.getLonLatFromViewPortPx(event.xy);
 
@@ -232,8 +244,9 @@
     this.map.addPopup(this.new_pic_popup);
   };
 
-  /* Resize the map in the full window view
-  */
+  /**
+   * Resizes the map in the full window view
+   */
   Map.handle_window_resize = function () {
     var self = this;
 
@@ -248,10 +261,10 @@
     }
   };
 
-  /* Set the map center
+  /**
+   * Sets the map center
    */
   Map.handle_map_center = function () {
-
     var zoom = 4;
 
     // set map center
@@ -269,10 +282,12 @@
     }
   };
 
-  /* Create an OpenLayers.LonLat object from lon lat values
-   * @param [Float] lon
-   * @param [Float] lat
-   * @return [<LonLat>]
+  /**
+   * Create an OpenLayers.LonLat object from lon lat values
+   *
+   * @param {Float} lon
+   * @param {Float} lat
+   * @return {LonLat}
    */
   Map.create_lonLat = function (lon, lat) {
     var lonLat = new OpenLayers.LonLat(lon, lat);
@@ -283,9 +298,11 @@
     return lonLat;
   };
 
-  /* Draw a pointer in the map
-   * @param [<Point>]
-   * @return [<Marker>]
+  /**
+   * Draws a pointer in the map
+   *
+   * @param {Point}
+   * @return {Marker}
    */
   Map.add_marker = function (point) {
 
@@ -323,9 +340,11 @@
     return marker;
   };
 
-  /* Check if the passed point is valid
-   * @param [<Point>] point
-   * @return [Boolean]
+  /**
+   * Check if the passed point is valid
+   *
+   * @param {Point} point
+   * @return {Boolean}
    */
   Map.is_valid_point = function (point) {
     return _.isNumber(point.latitude) && _.isNumber(point.longitude);
